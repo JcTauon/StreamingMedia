@@ -10,7 +10,7 @@
 
 /**CoreLibrary类
  *initCore()初始化核心库，传入配置参数(JSON格式字符串: 滤镜参数、分辨率设置、硬件加速选项等)
- *processVideoFrame()处理单帧视频数据，返回处理后的数据或状态码
+ *processVideoFrame()处理单帧视频数据，返回处理后的数据或状态码, Format选择的算法效果 (1: 美颜, 2: 夜景, 3: 人像优化, 4: 防抖)
  *processAudioData()处理音频数据，实现编解码同步
  *transmitData()实现网络传输，将处理后的数据通过Socket发送出去
  *releaseCore()释放核心库资源，结束所有后台处理

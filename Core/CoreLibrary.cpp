@@ -4,6 +4,9 @@
 #include "CoreLibrary.h"
 #include <iostream>
 
+#include <opencv2/opencv.hpp>
+
+
 CoreLibrary::CoreLibrary() : initialized(false) {
 }
 
@@ -45,7 +48,7 @@ int CoreLibrary::processAudioData(uint8_t *audioData, int sampleRate, int channe
 
 int CoreLibrary::transmitData(uint8_t *buffer, int length) {
     std::lock_guard<std::mutex> lock(libMutex);
-    if(!initialized) {
+    if (!initialized) {
         std::cerr << "[CoreLibrary] Error: Core not initialized!" << std::endl;
         return -1;
     }
@@ -68,12 +71,43 @@ void CoreLibrary::releaseCore() {
  ***/
 
 void CoreLibrary::applyVideoFilter(uint8_t *frameData, int width, int height, int format) {
-    std::cout << "[CoreLibrary] Applying video filter xxx" << std::endl;
+    std::cout << "[CoreLibrary] Applying video filter type: "
+            << format << std::endl;
 
-    //测试
-    if (frameData && width > 0 && height > 0) {
-        frameData[0] = 255;
+    cv::Mat frame(height, width, CV_8UC3, frameData);
+    cv::Mat processedFrame;
+
+    switch (format) {
+        case 1 : //美颜（使用双边滤波实现皮肤平滑效果）
+            std::cout << "[CoreLibrary] applyVideoFilter(), format = 1，face beautification effect" << std::endl;
+            cv::bilateralFilter(frame, processedFrame, 15, 80, 80);
+        break;
+        case 2: //夜景（增强亮度和对比度）
+            std::cout << "[CoreLibrary] applyVideoFilter(), format = 2，nightscape" << std::endl;
+            frame.convertTo(processedFrame, -1, 1.2, 30);
+        break;
+        case 3: // 人像优化（通过直方图均衡化增强肤色对比度）
+        {
+            std::cout << "[CoreLibrary] applyVideoFilter(), format = 3，Portrait Optimisation" << std::endl;
+            cv::Mat ycrcb;
+            cv::cvtColor(frame, ycrcb, cv::COLOR_BGR2YCrCb);
+            std::vector<cv::Mat> channels;
+            cv::split(ycrcb, channels);
+            cv::equalizeHist(channels[0],channels[0]);
+            cv::merge(channels, ycrcb);
+            cv::cvtColor(ycrcb, processedFrame, cv::COLOR_BGR2YCrCb);
+            break;
+        }
+        case 4:
+            std::cout << "[CoreLibrary] applyVideoFilter(), format = 4，Anti-shake, Gaussian Blur" << std::endl;
+            cv::GaussianBlur(frame, processedFrame, cv::Size(3,3), 0);
+        break;
+        default:
+            std::cout << "[CoreLibrary] Unknown effect format. No processing applied." << std::endl;
+        processedFrame = frame.clone();
+        break;
     }
+    std::memcpy(frameData, processedFrame.data, width * height * 3);
 }
 
 void CoreLibrary::processAudioBlock(uint8_t *audioData, int sampleRate, int channels) {
@@ -93,5 +127,3 @@ void CoreLibrary::simulateNetworkTransmission(uint8_t *buffer, int length) {
     std::cout << "[CoreLibrary] Simulating network transmission yyy" << std::endl;
     std::cout << "[CoreLibrary] Data transmitted sucessfully." << std::endl;
 }
-
-
