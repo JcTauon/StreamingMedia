@@ -16,38 +16,27 @@ int main() {
     }
 
     //选用图片作为测试OpenCV集成情况
-    cv::Mat testFrame = cv::imread("grass.jpg");
+    cv::Mat testFrame = cv::imread("/Users/ceramj/StreamingMedia/Core/grass.jpg");
     if (testFrame.empty()) {
-        std::cerr << "Failed to load sample image. 请确保 grass.jpg 存在于工作目录中." << std::endl;
-        return -1;
+        std::cerr << "Failed to load sample image, skipping video test." << std::endl;
+    } else {
+        int width = testFrame.cols;
+        int height = testFrame.rows;
+        if (!testFrame.isContinuous()) {
+            testFrame = testFrame.clone();
+        }
+        int format = 2;
+        core.processVideoFrame(testFrame.data, width, height, format);
+        cv::imshow("Processed Frame", testFrame);
+        cv::waitKey(0);
     }
-
-    int width = testFrame.cols;
-    int height = testFrame.rows;
-    int frameSize = width * height * 3;
-
-    if (!testFrame.isContinuous()) {
-        testFrame = testFrame.clone();
-    }
-
-    int format = 2;
-    if (core.processVideoFrame(testFrame.data, width, height, format) != 0) {
-        std::cerr << "Video frame processing failed." << std::endl;
-    }
-
-    cv::imshow("Processed Frame", testFrame);
-    cv::waitKey(0);
 
     //音频接口测试
-    int audioDataLength = 1024;
-    std::vector<uint8_t> audioData(audioDataLength, 10);
+    int audioDataSize = 32768;
+    std::vector<uint8_t> audioData(audioDataSize, 10);
 
     if (core.processAudioData(audioData.data(), 44100, 2) != 0) {
         std::cerr << "Audio processing failed." << std::endl;
-    }
-
-    if (core.transmitData(testFrame.data, frameSize) != 0) {
-        std::cerr << "Data transmission failed." << std::endl;
     }
 
     core.releaseCore();

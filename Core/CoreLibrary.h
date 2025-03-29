@@ -8,6 +8,14 @@
 #include <cstdint>
 #include <mutex>
 
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavutil/avutil.h>
+#include <libavutil/frame.h>
+#include <libavutil/mem.h>
+#include <libavutil/opt.h>
+#include <libavutil/imgutils.h>
+}
 /**CoreLibrary类
  *initCore()初始化核心库，传入配置参数(JSON格式字符串: 滤镜参数、分辨率设置、硬件加速选项等)
  *processVideoFrame()处理单帧视频数据，返回处理后的数据或状态码, Format选择的算法效果 (1: 美颜, 2: 夜景, 3: 人像优化, 4: 防抖)
@@ -37,5 +45,13 @@ private:
     void applyVideoFilter(uint8_t* frameData, int width, int height, int format);
     void processAudioBlock(uint8_t* audioData, int sampleRate, int channels);
     void simulateNetworkTransmission(uint8_t* buffer, int length);
+
+    AVCodecContext* audioCodecCtx;
+    AVFrame* audioFrame;
+    AVPacket* audioPacket;
+
+    bool initFFmpegAudioEncoder(int sampleRate, int channels);
+    bool encodeAudioFrame(uint8_t* audioData, int sampleRate, int channels);
+
 };
 #endif //CORELIBRARY_H
