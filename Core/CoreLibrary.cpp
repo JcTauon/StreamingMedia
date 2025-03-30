@@ -11,11 +11,21 @@ CoreLibrary::CoreLibrary()
     : initialized(false),
       audioCodecCtx(nullptr),
       audioFrame(nullptr),
-      audioPacket(nullptr) {
+      audioPacket(nullptr),
+      networkInited(false),
+      sockft(-1) {
+#ifdef _WIN32
+    WSADATA wsaData;
+    WSAStartup(MAKEWORD(2, 2), &wsaData);
+#endif
 }
+
 
 CoreLibrary::~CoreLibrary() {
     releaseCore();
+#ifdef _WIN32
+    WSACleanup(); // 释放Winsock
+#endif
 }
 
 int CoreLibrary::initCore(const std::string &configJson) {
@@ -173,6 +183,61 @@ bool CoreLibrary::encodeAudioFrame(uint8_t *audioData, int sampleRate, int chann
     return true;
 }
 
+bool CoreLibrary::initNetwork(const std::pmr::string &ip, int port) {
+    std::lock_guard<std::mutex> lock(libMutex);
+    if (!initialized) {
+        std::cerr << "[CoreLibrary] Error: Must call initCore() before initNetwork()." << std::endl;
+        return false;
+    }
+
+    if (networkInited) {
+        std::cout << "[CoreLibrary] Network already initialized." << std::endl;
+        return true;
+    }
+
+    sockft = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockft < 0) {
+        std::cerr << "[CoreLibrary] Failed to creat socket." << std::endl;
+        return false;
+    }
+
+    struct sockaddr_in serverAddr;
+    std::memset(&serverAddr, 0, sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(port);
+
+    if (inet_pton(AF_INET, ip.c_str(), &serverAddr.sin_addr) <= 0) {
+        std::cerr << "[CoreLibrary] Invail Ip address: " << ip << std::endl;
+        close(sockft);
+        sockft = -1;
+        return false;
+    }
+
+    if (connect(sockft, (struct sockaddr *) &serverAddr, sizeof(serverAddr)) < 0) {
+        std::cerr << "[CoreLibrary] Failed to connect to " << ip << ": " << port << std::endl;
+        close(sockft);
+        sockft = -1;
+        return false;
+    }
+
+    std::cout << "[CoreLibrary] Connect to " << ip << " : " << port << " successfully." << std::endl;
+    networkInited = true;
+    return true;
+}
+
+bool CoreLibrary::closeNetwork() {
+    std::lock_guard<std::mutex> lock(libMutex);
+    if (!networkInited) {
+        std::cerr << "[CoreLibrary] Network not initialized or already closed." << std::endl;
+        return false;
+    }
+
+    close(sockft);
+    sockft = -1;
+    networkInited = false;
+    std::cout << "[CoreLibrary] Network connection closed." << std::endl;
+    return true;
+}
 
 int CoreLibrary::transmitData(uint8_t *buffer, int length) {
     std::lock_guard<std::mutex> lock(libMutex);
@@ -180,16 +245,30 @@ int CoreLibrary::transmitData(uint8_t *buffer, int length) {
         std::cerr << "[CoreLibrary] Error: Core not initialized!" << std::endl;
         return -1;
     }
-
     std::cout << "[CoreLibrary] Transmitting data of length: " << length << std::endl;
-    simulateNetworkTransmission(buffer, length);
-    return 0;
+
+    if (networkInited && sockft >= 0) {
+        ssize_t sent = send(sockft, buffer, length, 0);
+        if (sent < 0) {
+            std::cerr << "[CoreLibrary] Socket send error." << std::endl;
+            return -1;
+        }
+        std::cout << "[CoreLibrary] Sent " << sent << " bytes via Socket." << std::endl;
+        return static_cast<int>(sent);
+    } else {
+        simulateNetworkTransmission(buffer, length);
+        return length;
+    }
 }
 
 void CoreLibrary::releaseCore() {
     std::lock_guard<std::mutex> lock(libMutex);
     if (initialized) {
         std::cout << "[CoreLibrary] Releasing resources..." << std::endl;
+
+        if (networkInited) {
+            closeNetwork();
+        }
 
         if (audioFrame) {
             av_frame_free(&audioFrame);

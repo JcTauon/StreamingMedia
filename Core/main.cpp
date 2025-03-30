@@ -15,6 +15,11 @@ int main() {
         return -1;
     }
 
+    bool netOK = core.initNetwork("127.0.0.1", 9000);
+    if (!netOK) {
+        std::cout << "[Main] initWork failed. Will use simulated transmission." << std::endl;
+    }
+
     //选用图片作为测试OpenCV集成情况
     cv::Mat testFrame = cv::imread("/Users/ceramj/StreamingMedia/Core/grass.jpg");
     if (testFrame.empty()) {
@@ -38,6 +43,8 @@ int main() {
     if (core.processAudioData(audioData.data(), 44100, 2) != 0) {
         std::cerr << "Audio processing failed." << std::endl;
     }
+
+    core.transmitData(audioData.data(), audioDataSize);
 
     core.releaseCore();
 
