@@ -2,7 +2,8 @@
 
 项目架构图如fig.1.所示
 
-<img width="904" alt="image" src="https://github.com/user-attachments/assets/c1621d8a-7474-4465-84e2-8c01d3634a18" />
+<img width="1774" alt="image" src="https://github.com/user-attachments/assets/0a9f5515-80ff-4dc0-b70d-75144bc720a9" />
+
 
 figrue.1. 项目架构图
 
