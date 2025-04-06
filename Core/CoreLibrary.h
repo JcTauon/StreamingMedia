@@ -6,7 +6,10 @@
 #define CORELIBRARY_H
 #include <string>
 #include <cstdint>
-#include <mutex>
+#include <mutex>// std::memset
+#include <arpa/inet.h>     // htons, inet_*
+
+
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -49,7 +52,7 @@ public:
 
     int processAudioData(uint8_t *audioData, int sampleRate, int channels);
 
-    bool initNetwork(const std::pmr::string &ip, int port);
+    bool initNetwork(const std::string &ip, int port);
 
     bool closeNetwork();
 

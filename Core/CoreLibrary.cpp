@@ -183,7 +183,7 @@ bool CoreLibrary::encodeAudioFrame(uint8_t *audioData, int sampleRate, int chann
     return true;
 }
 
-bool CoreLibrary::initNetwork(const std::pmr::string &ip, int port) {
+bool CoreLibrary::initNetwork(const std::string &ip, int port) {
     std::lock_guard<std::mutex> lock(libMutex);
     if (!initialized) {
         std::cerr << "[CoreLibrary] Error: Must call initCore() before initNetwork()." << std::endl;
