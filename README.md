@@ -27,3 +27,5 @@ figrue.1. 项目架构图
 ##### **跨终端通信**
 
 - 采用 Socket 实现实时通信。
+
+[编译Libcore.so](Compile_CoreLibrary.md#详细教程)
