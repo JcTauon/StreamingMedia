@@ -2,6 +2,12 @@ package com.example.androidplatform;
 
 public class CoreJNI {
     static {
+        System.loadLibrary("opencv_core");
+        System.loadLibrary("opencv_imgproc");
+        System.loadLibrary("opencv_highgui");
+        System.loadLibrary("opencv_videoio");
+        System.loadLibrary("opencv_imgcodecs");
+        System.loadLibrary("opencv_stitching");
         System.loadLibrary("native-lib");
         System.loadLibrary("core");
     }

@@ -1,19 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#202020"
     tools:context=".MainActivity">
 
-    <TextView
+    <SurfaceView
+        android:id="@+id/surfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#80000000"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <Button
+            android:id="@+id/startButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#4CAF50"
+            android:text="@string/start"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/stopButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#F44336"
+            android:text="@string/end"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <RadioGroup
+        android:id="@+id/filterSelector"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="10dp"
+        android:background="#66000000"
+        android:orientation="vertical"
+        android:padding="10dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <RadioButton
+            android:id="@+id/filterBeauty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="美颜"
+            android:textColor="#FFF"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/filterNight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="夜景增强"
+            android:textColor="#FFF" />
+
+        <RadioButton
+            android:id="@+id/filterPortrait"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="人像优化"
+            android:textColor="#FFF" />
+
+        <RadioButton
+            android:id="@+id/filterStable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="防抖"
+            android:textColor="#FFF" />
+    </RadioGroup>
+
+</RelativeLayout>
