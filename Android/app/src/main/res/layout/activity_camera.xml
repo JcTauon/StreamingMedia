@@ -2,16 +2,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#202020"
-    tools:context=".MainActivity">
+    android:background="#202020">
 
-    <SurfaceView
-        android:id="@+id/surfaceView"
+    <com.example.androidplatform.gl.MyGLSurfaceView
+        android:id="@+id/gl_surface_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
         android:padding="12dp">
 
         <Button
-            android:id="@+id/startButton"
+            android:id="@+id/btn_start"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -31,13 +31,21 @@
             android:textColor="#FFFFFF" />
 
         <Button
-            android:id="@+id/stopButton"
+            android:id="@+id/btn_stop"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:backgroundTint="#F44336"
             android:text="@string/end"
             android:textColor="#FFFFFF" />
+        <Button
+            android:id="@+id/btn_switch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#696969"
+            android:textColor="#FFFFFF"
+            android:text="@string/camera_switch"/>
     </LinearLayout>
 
     <RadioGroup
@@ -55,9 +63,9 @@
             android:id="@+id/filterBeauty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="true"
             android:text="美颜"
-            android:textColor="#FFF"
-            android:checked="true"/>
+            android:textColor="#FFF" />
 
         <RadioButton
             android:id="@+id/filterNight"

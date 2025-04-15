@@ -1,4 +1,4 @@
-package com.example.androidplatform;
+package com.example.androidplatform.camera;
 
 import android.content.Context;
 import android.util.AttributeSet;
